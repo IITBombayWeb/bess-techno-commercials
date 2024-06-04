@@ -1,0 +1,125 @@
+\section{BESS Peak-shifting Model v1}
+
+\paragraph{Peak-shifting} This is the most common strategy for BESS
+and means that the battery is charged during off-peak hours and 
+discharged during peak hours. The objective is to reduce the peak
+power demand and thereby reduce the electricity bill.
+
+\paragraph{Assumptions}
+\begin{enumerate}
+    \item Grid power is available at two prices: $R_{\text{p}}$ for peak
+    rate (Rs./kWh) and $R_{\text{n}}$ (Rs./kWh) for normal or base rate.
+    The relationship is defined
+    \begin{equation}
+        R_{\text{p}} = (1 + \alpha) R_{\text{n}},
+    \end{equation} 
+    where $\alpha$ is the premium for peak-rate power.
+
+    \item The peak-rate period per day is $T_{\text{p}}$ hours, and the 
+    normal-rate duration is $T_{\text{n}}$ hours per day.
+    $T_{\text{n}} > 2 T_{\text{p}} $, so that there is sufficient time 
+    to charge the battery at 0.5~C at normal-rate. 
+
+    \item During peak-rate hours, the power demand is $P_{\text{p}}$ kW, 
+    and during normal-rate hours, the power demand is $P_{\text{n}}$ kW.
+
+    \item The BESS has a discharge capacity of $C$ kWh, and the round-trip efficiency 
+    is $\eta$, defined by
+    \begin{equation}
+        \eta = \frac{\text{Energy out}}{\text{Energy in}} = \frac{C}{C_{\text{in}}}.
+    \end{equation}
+    The capacity of the BESS is chosen such that the peak power demand is met. 
+    The capacity required is
+    \begin{equation}
+        \label{eq:cv1}
+        C = \frac{P_{\text{p}} T_{\text{p}} }{2}.
+    \end{equation}
+    The factor 2 accounts for the fact that the battery charged/discharged twice a day,
+    because the peak-rate period is spaced out over two parts of the day.
+
+
+\end{enumerate}
+
+\paragraph{Model}
+
+Without the BESS, the daily electricity bill (in Rs.) is
+\begin{equation}
+    B_{\text{now}} = 
+    R_{\text{n}} P_{\text{n}} T_{\text{n}}  +
+    R_{\text{p}} P_{\text{p}} T_{\text{p}} 
+\end{equation}
+With the BESS in peak-shifting mode, grid is used only during the normal-rate
+hours, to supply power to the load as well as to charge the battery twice (up to
+the capacity requried for the peak discharge).  The daily electricity bill is
+\begin{equation}
+    \label{eq:bv1}
+    B_{\text{v1}} = 
+    R_\text{n} \left(P_{\text{n}}  T_{\text{n}}  +  
+     2 \, \frac{C}{\eta} \right)
+\end{equation}
+Daily savings due to BESS is
+\begin{align}
+    S_\text{v1} & = B_{\text{now}} - B_{\text{v1}} \\
+    & =  R_{\text{p}} P_{\text{p}} T_{\text{p}} - 2 \, R_\text{n} \, C \\
+    & =  R_{\text{n}} \, (1+ \alpha) 2 \, C - 2 \, R_\text{n} \, C/\eta  \\
+    & =   2 \, R_{\text{n}} \, C \left[   (1 + \alpha) - 1/\eta \right].
+    \label{eq:sv1}
+\end{align}
+
+\paragraph{Payback period} The capital cost of the BESS is $K$ Rs./kWh
+of capacity. The payback period is the time taken for the savings to
+equal the capital cost. The payback period (in years) is
+\begin{equation}
+    \label{eq:pb1}
+    Y_\text{v1} = \frac{K \, C}{S_\text{v1} \, d_\text{y}} 
+    = \frac{K}{2 \, R_\text{n} \, d_\text{y}} \frac{1}{\left[  (1 + \alpha)
+    - 1/\eta\right]},
+\end{equation} 
+where $d_\text{y}$ is the number of active power consumption days in a year. 
+Note that the expression for the paypack period is independent of the
+actual consumption, total captital cost, and capacity of the BESS. It
+only depends on the capital cost per kWh, premium for peak-rate power,
+the round-trip efficiency, and the normal rate.
+
+\paragraph{Example 1.1} Payback period for a BESS.
+Let $R_{\text{n}} = 7$ Rs./kWh, $\alpha = 0.25$,
+$d_\text{y} = 300$ days, $K = 30000$ Rs./kWh, $\eta = 0.90$.
+The payback period directly evaluated from Eq.~\eqref{eq:pb1} is
+\begin{equation}
+    Y_\text{v1} = \frac{30000}{2 \times 7 \times 300} 
+    \frac{1}{ [1.25 - 1/0.95]} \approx 38 \text{ years}.
+\end{equation}
+Additionally, to obtain the capacity of the BESS, let
+$T_{\text{p}} = 8$ hours, $P_{\text{p}} = 50$~kW. From Eq.~\eqref{eq:cv1},
+\begin{equation}
+    C = \frac{50 \times 8}{2 \times 0.95} \approx 210 \text{ kWh}.
+\end{equation}
+
+\paragraph{Example 1.2} What does the peak-rate premium need to be for a payback period of 5 years. 
+Approximating $\eta \approx 1$ in Eq.~\eqref{eq:pb1}, we have
+\begin{equation}
+    Y_\text{v1} = \frac{K}{  2 \, \alpha \, R_\text{n} \, d_\text{y}} 
+\end{equation}
+Or the premium should be
+\begin{equation}
+    \alpha = 
+        \frac{K}{ 2\, Y_\text{v1} \, R_\text{n} \, d_\text{y}}
+        = 
+        \frac{30000}{2 \times 5 \times 7 \times 300} \approx 1.4
+\end{equation}
+The peak-rate should be 
+\begin{equation}
+    R_{\text{p}} = (1+1.4) \times 7 = 16.8 \text{ Rs./kWh}.
+\end{equation}
+
+
+
+
+
+% This is Silpa's first funded conference travel from IIT Bombay. Her performance so far is commendable.  I strongly recommend this support.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paybackPeriod"
+%%% End:

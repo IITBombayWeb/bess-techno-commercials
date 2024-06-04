@@ -1,0 +1,121 @@
+
+\section{Off-Grid, Solar-BESS Model v3}
+This is an extreme case of assuming unlimited area available to
+install solar panels so that it is not necessary (or possible) to use
+Grid energy at all, eg. as in a remote location. Let $E_\text{sp}$ be the
+average energy available from one solar panel per day and $N_\text{sp}$ be
+the number of solar panels installed. The duration of solar availability
+is $T_\text{s}$ hr per day.
+
+\paragraph{Assumptions}
+\begin{enumerate}
+    \item Though there is no peak and normal load or rates in an off-grid strategy,
+    we will use the same notation as in the previous models to obtain the
+    load profile and compute the savings in comparison to the current electricity bill
+    ($B_\text{now}$). 
+    \item The day is divided into: Half peak load during solar availability,
+    normal load during solar availability, 
+    half peak load during night, normal load during night time, and an idle time 
+    when there is no significant load ($P_\text{n} \gg P_\text{idle}\approx 0$).
+    \begin{equation}
+        24 = \left[ \frac{T_\text{p}}{2} + T_\text{nd} \right]_\text{day} 
+        + \left[ \frac{T_\text{p}}{2} + T_\text{nn} + T_\text{idle} \right]_\text{night}
+    \end{equation}
+    \item During day time BESS is charged. This means solar
+    energy is used for the load as well as charging BESS sufficiently
+    for the night time discharge.
+
+\end{enumerate}
+
+\paragraph{Capacity of the BESS system} We have to revise the capacity from the
+earlier estimate as the BESS now has to support a larger load.  BESS
+discharges only during the night time supporting the half peak load and normal night load. 
+
+\begin{equation}
+    C = \frac{P_\text{p} T_\text{p} }{2 \eta} + \frac{P_\text{n} T_\text{nn} }{\eta}.
+\end{equation}
+During the day time, solar supports half of "peak" load, normal day-time load,
+and charges the BESS.  Solar capacity needed is
+\begin{equation}
+    \label{eq:cs}
+   C_\text{solar} = 
+        \frac{P_\text{p} T_\text{p} }{2} + P_\text{n}  \left[T_\text{s} - \frac{T_\text{p}}{2} \right] + C
+\end{equation}
+The number of solar panels required is
+\begin{equation}
+    N_\text{sp} = \frac{C_\text{solar}}{E_\text{sp}}.
+\end{equation}
+The daily electricity bill for the off-grid system is
+\begin{equation}
+    B_\text{v3} = R_\text{s} \, C_\text{solar}.
+\end{equation}
+The savings due to the Solar-BESS is
+\begin{equation}
+    S_\text{v3} = B_\text{now} - B_\text{v3} 
+\end{equation}
+There is no simple expression for the payback period in this case.
+\begin{equation}
+    Y_\text{v3} = \frac{K \, C}{S_\text{v3} \, d_\text{y}}.
+\end{equation}
+and the payback period is to be calculated numerically step-wise, dependent
+on all the parameters used BESS capital cost, power rates, load 
+consumption pattern, solar availability, and round-trip efficiency.
+
+\paragraph{Example 3.1} Off-grid Solar-BESS system.
+Let $R_{\text{s}} = 2$ Rs./kWh, $R_\text{n} = 7$Rs./kWh, $\alpha=0.25$,
+$T_\text{p}=8$~hrs, $P_\text{p} = 40$~kW, $T_\text{nd}=8$~hrs, $T_\text{nn}=0$,
+$P_\text{n} = 50$~kW, $T_{\text{s}} = 7$~hrs, $E_{\text{sp}} = 4.5$ kWh, $K =
+30000$ Rs./kWh, $\eta = 0.95$. 
+
+The daily load is
+\begin{align}
+    E_{\text{load}} & = P_{\text{p}} T_{\text{p}} 
+    + P_{\text{n}} T_{\text{nd}} + P_\text{n} T_\text{nn} 
+    + \cancelto{0}{P_\text{idle}} T_\text{idle}
+    \\
+    & = 40 \times 8 + 50 \times 8 + 0 = 720 \text{ kWh}.  
+\end{align}
+Energy bill without solar+BESS is
+\begin{align}
+    B_{\text{now}} & = 
+    R_\text{p} \, P_{\text{p}} T_{\text{p}} + R_\text{n} ( 
+    P_{\text{n}} T_{\text{nd}}+ P_\text{n} T_\text{nn} )   \\
+    &= 8.75 \times 320 + 7 \times 400 = \text{Rs. } 5600
+\end{align}
+BESS capacity is
+\begin{align}
+    C & = \frac{P_\text{p} T_\text{p} }{2 \eta} + \frac{P_\text{n} T_\text{nn} }{\eta} \\
+    & = \frac{40 \times 8}{2 \times 0.95} + 0 = 168 \text{ kWh} \approx\to 180 \text{ kWh}.
+\end{align}
+Using battery modules in units of approx 15 kWh, we need ceil(168/15) = 12 modules, or 180 kWh.
+The solar capacity is
+\begin{align}
+    C_{\text{solar}} & = 
+    \frac{P_{\text{p}} T_{\text{p}} }{2} + P_{\text{n}} \left[T_{\text{s}} - \frac{T_{\text{p}}}{2} \right] + C
+    = 40 \times 4 + 50 \times 3 + 180 = 490 \text{ kWh}.
+\end{align}
+Number of solar panels required is
+\begin{equation}
+    N_{\text{sp}} = \frac{490}{4.5} \approx 109.
+\end{equation}
+Daily energy bill with Solar-BESS is
+\begin{equation}
+    B_{\text{v3}} = 2 \times 490 = 980 \text{ Rs.}
+\end{equation}
+Daily savings is
+\begin{equation}
+    S_{\text{v3}} = 5600 - 980 = 4620 \text{ Rs.}
+\end{equation}
+Capital cost of the BESS is
+\begin{equation}
+    K = 30000 \text{ Rs./kWh} \times 180 \text{ kWh} = \text{Rs. }54 \text{ lakhs}.
+\end{equation}
+Payback period is
+\begin{equation}
+    Y_{\text{v3}} = \frac{54 \text{ lakhs}}{4620 \times 300} \approx 4 \text{ years}.
+\end{equation}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paybackPeriod"
+%%% End:

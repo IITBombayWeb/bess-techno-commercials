@@ -1,0 +1,45 @@
+\section{BESS Peak-shifting Solar Charging Model v2}
+In this model the BESS is charged using solar power during the day, and
+discharged during the peak-rate hours. The solar power is
+assumed to be available at the rate of $R_{\text{s}}$~Rs./kWh. Though
+there is no actual running cost (other than maintenance), the solar
+rate is essentially the capital cost ammortized over the life of the
+solar panels.  The electricity bill in this case consists of the normal rate 
+and using the solar power to charge the BESS sufficient to meet the 
+peak power demand.
+\begin{equation}
+    B_{\text{v2}} = 
+    R_{\text{n}} P_{\text{n}} T_{\text{n}} +
+    R_{\text{s}} (2 \, C)
+\end{equation} 
+
+Daily savings due to BESS is
+\begin{equation}
+    S_\text{v2} = \left(R_{\text{p}} - \frac{R_{\text{s}}}{\eta}\right) P_{\text{p}} T_{\text{p}} 
+    = \left(R_{\text{p}} - \frac{R_{\text{s}}}{\eta}\right) \, 2 \, \eta \, C \, .
+\end{equation}
+The payback period is
+\begin{equation}
+    Y_\text{v2} = \frac{K \, C}{S_\text{v2} \, d_\text{y}} 
+    = \frac{K}{2 \, \eta \, d_\text{y}} \frac{1}{\left(R_{\text{p}} - \frac{R_{\text{s}}}{\eta}\right)}.
+\end{equation}
+Note that the expression for the paypack period is independent of the
+actual consumption, total captital cost, and capacity of the BESS. It
+only depends on the capital cost per kWh, effective solar rate,
+the round-trip efficiency, and the peak rate (in contrast to 
+Model v1, which depended on normal rate).
+
+
+\paragraph{Example 2.1} Payback period for a BESS with solar charging. 
+Let $R_{\text{s}} = 2$ Rs./kWh, and the rest same as Example 1.1.
+The payback period is
+\begin{equation}
+    Y_\text{v2} = \frac{30000}{2 \times 0.95 \times 300} 
+    \frac{1}{8.75 - 2/0.95} \approx 8 \text{ years}.
+\end{equation}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paybackPeriod"
+%%% End:

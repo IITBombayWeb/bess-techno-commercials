@@ -1,0 +1,73 @@
+\section{Limited Solar-BESS Model v4}
+In this model, the solar capacity is limited, either due to a pre-installed capacity
+or there is no more area available to install panels. Grid power is available.
+
+\paragraph{Assumptions}
+\begin{enumerate}
+    \item The solar capacity is limited to $C_{\text{solar}}$ kWh, 
+    \begin{equation}
+        C_{\text{solar}} = \varepsilon_{\text{s}} \, E_{\text{load}}. 
+    \end{equation}
+    where $\varepsilon_{\text{s}}$ is the fraction of the daily energy load
+    $E_{\text{load}}$ provided by solar power. 
+
+    \item The total daily load is divided into peak and normal load during day and night
+    times as in the previous models.
+    \begin{equation}
+    E_{\text{load}}  = P_{\text{p}} T_{\text{p}} 
+    + P_{\text{n}} T_{\text{nd}} + P_\text{n} T_\text{nn} 
+    + P_\text{idle} T_\text{idle}
+    \end{equation}
+
+ 
+    \item During peak hours, BESS and solar provide the power to the load.
+    \item During normal hours, BESS is charged using solar power and grid power.
+    
+\end{enumerate}
+
+\paragraph{Model} The capacity of the BESS is the same as in Model v1, in that it has to support
+the load demand during peak hours (occurring twice a day). 
+\begin{equation}
+    C_{\text{v4}} = \frac{P_{\text{p}} T_{\text{p}} }{2 \eta}.
+\end{equation}
+The daily electricity bill is
+\begin{align}
+    B_{\text{v4}} & = 
+       R_{\text{s}} C_{\text{solar}} \frac{T_{\text{p}}/2}{T_\text{s}} \quad \text{(peak, day)}  \\
+    & + R_{\text{s}} C_{\text{solar}} \frac{T_{\text{nd}}}{T_\text{s}} 
+    + R_{\text{n}} \left[ (P_{\text{n}} T_{\text{nd}} - C_{\text{solar}}) + C \right] 
+     \quad \text{(normal, day)} \\
+     & + 0 \quad \text{(peak, night)} \\
+     & + R_{\text{n}} \left[ P_{\text{n}} T_{\text{nn}} + C \right] \quad \text{(normal, night)} \\
+     & + 0 \quad \text{(idle)} \\
+     & = R_{\text{s}} C_{\text{solar}} + R_{\text{n}} \left[ P_{\text{n}} T_{\text{n}} 
+     - C_{\text{solar}} + 2 C \right] \\
+     & = (R_{\text{s}}-R_{\text{n}}) \, C_{\text{solar}}  + R_{\text{n}} 
+     \left[ P_{\text{n}} T_{\text{n}}  + 2 C \right].
+\end{align}
+Notes: 
+\begin{enumerate}
+\item The first term in the first line represents the cost of the fraction of
+the daily solar energy used during the day time peak-rate period (towards the load demand).  The
+remaining load demand is met by the BESS (for which there is no cost).
+
+\item The first term in the second line represents the balance fraction of the solar power used
+for during the normal-rate period.
+
+\item The second term in the second line represents the cost of the normal-rate grid power 
+used to meet the balance of the normal-rate load and to charge the BESS.
+
+\item During normal-rate day time, it does not matter
+if the BESS is being charged by solar or grid power. The combined demand of the
+BESS and the load is met jointly by solar and grid power. That is the reason
+the term $R_{\text{s}} C_{\text{solar}}$ appears as a single term after
+simplification.  
+
+\item A simplification of $T_{\text{n}} = T_{\text{nd}} + T_{\text{nn}}$, the total normal-rate duration, has been used.
+
+\end{enumerate}
+
+%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paybackPeriod"
+%%% End:

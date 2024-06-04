@@ -1,0 +1,363 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{calrsfs}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{datetime}
+\mathtoolsset{showonlyrefs}
+\pagestyle{empty}
+
+
+\begin{document}
+
+\title{Payback Period of BESS Strategies}
+\author{P Sunthar}
+
+\maketitle
+
+
+\begin{tabular}{ll}
+Memo no. & \texttt{PS-0001T\_RevA} \\
+Date & \today \\
+To & GN, KC, MR, BW, CK \\
+From & PS \\
+Subject & Payback Period of BESS Strategies \\
+\end{tabular}
+
+
+\section{Introduction}
+
+The payback period (PP) of a battery energy storage system
+(BESS) is a key metric for evaluating the economic feasibility of a
+BESS project. 
+
+Instead of doing a rigorous economic analysis, we will focus on the key
+factors that determine the payback period of a BESS. We will use simple models
+for the capital cost and savings of a BESS, and derive the PP under
+various strategies of operation.
+
+
+\section{BESS Peak-shifting Model v1}
+
+\paragraph{Peak-shifting} This is the most common strategy for BESS
+and means that the battery is charged during off-peak hours and 
+discharged during peak hours. The objective is to reduce the peak
+power demand and thereby reduce the electricity bill.
+
+\paragraph{Assumptions}
+\begin{enumerate}
+    \item Grid power is available at two prices: $R_{\text{p}}$ for peak
+    rate (Rs./kWh) and $R_{\text{n}}$ (Rs./kWh) for normal or base rate.
+    The relationship is defined
+    \begin{equation}
+        R_{\text{p}} = (1 + \alpha) R_{\text{n}},
+    \end{equation} 
+    where $\alpha$ is the premium for peak-rate power.
+
+    \item The peak-rate period per day is $T_{\text{p}}$ hours, and the 
+    normal-rate duration is $T_{\text{n}}$ hours per day.
+    $T_{\text{n}} > 2 T_{\text{p}} $, so that there is sufficient time 
+    to charge the battery at 0.5~C at normal rate. 
+
+    \item During peak-rate hours, the power demand is $P_{\text{p}}$ kW, 
+    and during normal-rate hours, the power demand is $P_{\text{n}}$ kW.
+
+    \item The BESS has a capacity of $C$ kWh, and the round-trip efficiency 
+    is $\eta$.
+    The capacity of the BESS is chosen such that the peak power demand is met. 
+    The capacity required is
+    \begin{equation}
+        C = \frac{P_{\text{p}} T_{\text{p}} }{2 \, \eta}.
+    \end{equation}
+    The factor 2 accounts for the fact that the battery charged/discharged twice a day,
+    because the peak-rate period is spaced out over two parts of the day.
+
+
+\end{enumerate}
+
+\paragraph{Model}
+
+Without the BESS, the daily electricity bill (in Rs.) is
+\begin{equation}
+    B_{\text{now}} = 
+    R_{\text{n}} P_{\text{n}} T_{\text{n}}  +
+    R_{\text{p}} P_{\text{p}} T_{\text{p}} . 
+\end{equation}
+With the BESS, grid is used only during the normal-rate hours, to supply the load
+as well as to charge the battery (up to the capacity requried for the peak discharge). 
+The daily electricity bill is
+\begin{equation}
+    B_{\text{v1}} = 
+    R_\text{n} \left(P_{\text{n}}  T_{\text{n}}  +  
+     C \right)
+    = 
+    R_\text{n} \left( P_{\text{n}} T_{\text{n}} +  
+    P_{\text{p}} T_{\text{p}} \frac{1}{\eta} \right)
+\end{equation}
+Daily savings due to BESS is
+\begin{align}
+    \label{eq:sv1}
+    S_\text{v1} & = B_{\text{now}} - B_{\text{v1}} = 
+    R_{\text{n}} P_{\text{p}} T_{\text{p}} \left(1 + \alpha - \frac{1}{\eta}\right) \\
+    & =  2 \eta \, C \,  R_{\text{n}} \left(1 + \alpha - \frac{1}{\eta}\right).
+\end{align}
+
+
+% For an ideal BESS ($\eta = 1$), the savings is
+% \begin{equation}
+%     S_\text{v1.1} = R_{\text{n}} P_{\text{p}} T_{\text{p}} \alpha.
+% \end{equation}
+
+\paragraph{Payback period} The capital cost of the BESS is $K$ Rs./kWh
+of capacity. The payback period is the time taken for the savings to
+equal the capital cost. The payback period (in years) is
+\begin{equation}
+    \label{eq:pb1}
+    Y_\text{v1} = \frac{K \, C}{S_\text{v1} \, d_\text{y}} 
+    = \frac{K}{2 \, \eta \, R_\text{n} \, d_\text{y}} \frac{1}{\left(1 + \alpha 
+    - \frac{1}{\eta}\right)}
+\end{equation} 
+where $d_\text{y}$ is the number of active power consumption days in a year. 
+Note that the expression for the paypack period is independent of the
+actual consumption, total captital cost, and capacity of the BESS. It
+only depends on the capital cost per kWh, premium for peak-rate power,
+the round-trip efficiency, and the normal rate.
+
+\paragraph{Example 1.1} Payback period for a BESS.
+Let $R_{\text{n}} = 7$ Rs./kWh, $\alpha = 0.25$,
+$T_{\text{n}} = 16$ hours, $T_{\text{p}} = 8$ hours, $P_{\text{p}} = 50$~kW,
+$d_\text{y} = 300$ days, $K = 30000$ Rs./kWh, $\eta = 0.95$. The capacity of the BESS is 
+\begin{equation}
+    C = \frac{8 \times 50}{2 \times 0.95} \approx 210 \text{ kWh}.
+\end{equation}
+The payback period directly evaluated from Eq.~\eqref{eq:pb1} is
+\begin{equation}
+    Y_\text{v1} = \frac{30000}{2 \times 0.95 \times 7 \times 300} 
+    \frac{1}{1.25 - 1/0.95} \approx 38 \text{ years}.
+\end{equation}
+
+\paragraph{Example 1.2} What does the peak-rate premium need to be for a payback period of 5 years. 
+Approximating $\eta \approx 1$ in Eq.~\eqref{eq:pb1}, we have
+\begin{equation}
+    Y_\text{v1} = \frac{K}{2 \, \alpha \, R_\text{n} \, d_\text{y}} 
+\end{equation}
+Or the premium should be
+\begin{equation}
+    \alpha = \frac{K}{2 \, Y_\text{v1} \, R_\text{n} \, d_\text{y}} = \frac{30000}{2 \times 5 \times 7 \times 300}  \approx 1.4.
+\end{equation}
+The peak-rate should be 
+\begin{equation}
+    R_{\text{p}} = (1+1.4) \times 7 = 16.8 \text{ Rs./kWh}.
+\end{equation}
+
+
+
+\section{BESS Peak-shifting Solar Charging Model v2}
+In this model the BESS is charged using solar power during the day, and
+discharged during the peak-rate hours. The solar power is
+assumed to be available at the rate of $R_{\text{s}}$~Rs./kWh. Though
+there is no actual running cost (other than maintenance), the solar
+rate is essentially the capital cost ammortized over the life of the
+solar panels.  The daily electricity bill is
+\begin{equation}
+    B_{\text{v2}} = 
+    R_{\text{n}} P_{\text{n}} T_{\text{n}} +
+    R_{\text{s}} P_{\text{p}} T_{\text{p}} \, \frac{1}{\eta}.
+\end{equation} 
+Daily savings due to BESS is
+\begin{equation}
+    S_\text{v2} = \left(R_{\text{p}} - \frac{R_{\text{s}}}{\eta}\right) P_{\text{p}} T_{\text{p}} 
+    = \left(R_{\text{p}} - \frac{R_{\text{s}}}{\eta}\right) \, 2 \, \eta \, C \, .
+\end{equation}
+The payback period is
+\begin{equation}
+    Y_\text{v2} = \frac{K \, C}{S_\text{v2} \, d_\text{y}} 
+    = \frac{K}{2 \, \eta \, d_\text{y}} \frac{1}{\left(R_{\text{p}} - \frac{R_{\text{s}}}{\eta}\right)}.
+\end{equation}
+Note that the expression for the paypack period is independent of the
+actual consumption, total captital cost, and capacity of the BESS. It
+only depends on the capital cost per kWh, effective solar rate,
+the round-trip efficiency, and the peak rate (in contrast to 
+Model v1, which depended on normal rate).
+
+
+\paragraph{Example 2.1} Payback period for a BESS with solar charging. 
+Let $R_{\text{s}} = 2$ Rs./kWh, and the rest same as Example 1.1.
+The payback period is
+\begin{equation}
+    Y_\text{v2} = \frac{30000}{2 \times 0.95 \times 300} 
+    \frac{1}{8.75 - 2/0.95} \approx 8 \text{ years}.
+\end{equation}
+
+\section{Off-Grid, Solar-BESS Model v3}
+This is an extreme case of assuming unlimited area available to
+install solar panels so that it is not necessary (or possible) to use
+Grid energy at all, eg. as in a remote location. Let $E_\text{sp}$ be the
+average energy available from one solar panel per day and $N_\text{sp}$ be
+the number of solar panels installed. The duration of solar availability
+is $T_\text{s}$ hr per day.
+
+\paragraph{Assumptions}
+\begin{enumerate}
+    \item Though there is no peak and normal load or rates in an off-grid strategy,
+    we will use the same notation as in the previous models to obtain the
+    load profile and compute the savings in comparison to the current electricity bill
+    ($B_\text{now}$). 
+    \item The day is divided into: Half peak load during solar availability,
+    normal load during solar availability, 
+    half peak load during night, normal load during night time, and an idle time 
+    when there is no significant load ($P_\text{n} \gg P_\text{idle}\approx 0$).
+    \begin{equation}
+        24 = \left[ \frac{T_\text{p}}{2} + T_\text{nd} \right]_\text{day} 
+        + \left[ \frac{T_\text{p}}{2} + T_\text{nn} + T_\text{idle} \right]_\text{night}
+    \end{equation}
+    \item During day time BESS is charged. This means solar
+    energy is used for the load as well as charging BESS sufficiently
+    for the night time discharge.
+
+\end{enumerate}
+
+\paragraph{Capacity of the BESS system} We have to revise the capacity from the
+earlier estimate as the BESS now has to support a larger load.  BESS
+discharges only during the night time supporting the half peak load and normal night load. 
+
+\begin{equation}
+    C = \frac{P_\text{p} T_\text{p} }{2 \eta} + \frac{P_\text{n} T_\text{nn} }{\eta}.
+\end{equation}
+During the day time, solar supports half of "peak" load, normal day-time load,
+and charges the BESS.  Solar capacity needed is
+\begin{equation}
+    \label{eq:cs}
+   C_\text{solar} = 
+        \frac{P_\text{p} T_\text{p} }{2} + P_\text{n}  \left[T_\text{s} - \frac{T_\text{p}}{2} \right] + C
+\end{equation}
+The number of solar panels required is
+\begin{equation}
+    N_\text{sp} = \frac{C_\text{solar}}{E_\text{sp}}.
+\end{equation}
+The daily electricity bill for the off-grid system is
+\begin{equation}
+    B_\text{v3} = R_\text{s} \, C_\text{solar}.
+\end{equation}
+The savings due to the Solar-BESS is
+\begin{equation}
+    S_\text{v3} = B_\text{now} - B_\text{v3} 
+\end{equation}
+There is no simple expression for the payback period in this case.
+\begin{equation}
+    Y_\text{v3} = \frac{K \, C}{S_\text{v3} \, d_\text{y}}.
+\end{equation}
+and the payback period is to be calculated numerically step-wise, dependent
+on all the parameters used BESS capital cost, power rates, load 
+consumption pattern, solar availability, and round-trip efficiency.
+
+\paragraph{Example 3.1} Off-grid Solar-BESS system.
+Let $R_{\text{s}} = 2$ Rs./kWh, $R_\text{n} = 7$Rs./kWh, $\alpha=0.25$,
+$T_\text{p}=8$~hrs, $P_\text{p} = 40$~kW, $T_\text{nd}=8$~hrs, $T_\text{nn}=0$,
+$P_\text{n} = 50$~kW, $T_{\text{s}} = 7$~hrs, $E_{\text{sp}} = 4.5$ kWh, $K =
+30000$ Rs./kWh, $\eta = 0.95$. 
+
+The daily load is
+\begin{align}
+    E_{\text{load}} & = P_{\text{p}} T_{\text{p}} + P_{\text{n}} T_{\text{nd}} + P_\text{n} T_\text{nn} \\
+    & = 40 \times 8 + 50 \times 8 + 0 = 720 \text{ kWh}.  
+\end{align}
+Energy bill without solar+BESS is
+\begin{align}
+    B_{\text{now}} & = 
+    R_\text{p} \, P_{\text{p}} T_{\text{p}} + R_\text{n} ( 
+    P_{\text{n}} T_{\text{nd}}+ P_\text{n} T_\text{nn} )   \\
+    &= 8.75 \times 320 + 7 \times 400 = \text{Rs. } 5600
+\end{align}
+BESS capacity is
+\begin{align}
+    C & = \frac{P_\text{p} T_\text{p} }{2 \eta} + \frac{P_\text{n} T_\text{nn} }{\eta} \\
+    & = \frac{40 \times 8}{2 \times 0.95} + 0 = 168 \text{ kWh} \approx\to 180 \text{ kWh}.
+\end{align}
+Using battery modules in units of approx 15 kWh, we need ceil(168/15) = 12 modules, or 180 kWh.
+The solar capacity is
+\begin{align}
+    C_{\text{solar}} & = 
+    \frac{P_{\text{p}} T_{\text{p}} }{2} + P_{\text{n}} \left[T_{\text{s}} - \frac{T_{\text{p}}}{2} \right] + C
+    = 40 \times 4 + 50 \times 3 + 180 = 490 \text{ kWh}.
+\end{align}
+Number of solar panels required is
+\begin{equation}
+    N_{\text{sp}} = \frac{490}{4.5} \approx 109.
+\end{equation}
+Daily energy bill with Solar-BESS is
+\begin{equation}
+    B_{\text{v3}} = 2 \times 490 = 980 \text{ Rs.}
+\end{equation}
+Daily savings is
+\begin{equation}
+    S_{\text{v3}} = 5600 - 980 = 4620 \text{ Rs.}
+\end{equation}
+Capital cost of the BESS is
+\begin{equation}
+    K = 30000 \text{ Rs./kWh} \times 180 \text{ kWh} = \text{Rs. }54 \text{ lakhs}.
+\end{equation}
+Payback period is
+\begin{equation}
+    Y_{\text{v3}} = \frac{54 \text{ lakhs}}{4620 \times 300} \approx 4 \text{ years}.
+\end{equation}
+
+\section{Limited Solar-BESS Model v4}
+In this model, the solar capacity is limited, and the BESS is charged
+using solar power during the day, and discharged during the peak-rate hours.
+Grid power is available to supplement the solar power for the load during 
+peak hours, and for charging BESS during night time.
+
+
+\section{Combustion Engine (Diesel generator) replacement BESS Model v5}
+
+In this model, the BESS is used to replace a diesel generator or any other
+fuel-combustion engine such as that using LNG. For simplicity, we will
+assume that the generator is used only during the peak hours, when there
+is likely to be a power cut. BESS is used to supply the load during the
+peak hours and is charged during the normal hours (BESS peak shifting).
+
+Let $R_{\text{g}} = (1 + \gamma) \, R_\text{n}$ be the rate (Rs./kWh) for the generator fuel, and
+$T_{\text{g}}$ be the duration of the generator operation per day. The daily
+electricity bill for the generator
+supported backup power for peak hours is
+\begin{equation}
+    B_{\text{g}} = 
+    R_{\text{n}} P_{\text{n}} T_{\text{n}} +
+    R_{\text{p}} P_{\text{p}} (T_{\text{p}} - T_\text{g})  + 
+    R_{\text{g}} P_{\text{p}} T_{\text{g}} .
+\end{equation}
+Replacing the generator with BESS during the peak hours,
+and charging during the normal hours, the daily electricity bill is
+\begin{equation}
+    B_{\text{v5}} = 
+    R_\text{n} \left( P_{\text{n}} T_{\text{n}} +  
+    C \right)
+\end{equation}
+where $C$ is the capacity of the BESS required to support the peak power demand, 
+and is same as in Model v1, Eq.~\eqref{eq:cs}.
+The savings due to the BESS peak-shifting is
+\begin{equation}
+    S_\text{v5} = B_{\text{g}} - B_{\text{v5}} 
+    = P_{\text{p}} T_{\text{g}} \left(R_{\text{g}} - C \right).
+\end{equation}
+
+
+
+
+
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

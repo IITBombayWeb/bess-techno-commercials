@@ -1,0 +1,86 @@
+\section{Combustion Engine (Diesel generator) replacement BESS Model v5}
+
+In this model, the BESS is used to replace a diesel generator or any other
+fuel-combustion engine such as that using LNG. For simplicity, we will
+assume that the generator is used only during the peak hours, when there
+is likely to be a power cut. BESS is used to supply the load during the
+peak hours and is charged during the normal hours (BESS peak shifting).
+
+Let $R_{\text{g}} = (1 + \gamma) \, R_\text{n}$ be the rate (Rs./kWh) for the
+generator fuel, and $T_{\text{g}} = \tau_{\text{d}} \, T_\text{p} $ be the duration of
+the generator operation per day. Here, $\tau_\text{d}$ is the fraction of the
+peak period there is a power-cut and the generator supplies the load.  The daily
+electricity bill for the generator supported backup power for peak hours is
+composed of the normal rate, peak rate without the generator, and generator
+rate:
+\begin{equation}
+    B_{\text{g}} = 
+    R_{\text{n}} P_{\text{n}} T_{\text{n}} +
+    R_{\text{p}} P_{\text{p}} (T_{\text{p}} - T_\text{g})  + 
+    R_{\text{g}} P_{\text{p}} T_{\text{g}} .
+\end{equation}
+In Model v5, the generator is then replaced by the BESS during the peak hours (as a power
+backup as well as peak-shifting). This means BESS takes over the load during
+peak, irrespective of whether or not there is a power-cut. It is charged during
+the normal hours.  In this case the daily electricity bill is (as with Model v1
+in Eq.~\eqref{eq:bv1})
+\begin{equation}
+    B_{\text{v5}} = 
+    R_\text{n} \left( P_{\text{n}} T_{\text{n}} +  
+    2 C \right)
+\end{equation}
+where $C$ is the capacity of the BESS required to support the peak power demand.
+The savings due to the BESS peak-shifting is
+\begin{align}
+    S_\text{v5} = B_{\text{g}} - B_{\text{v5}} 
+    & = R_{\text{p}} P_{\text{p}} (T_{\text{p}} - T_\text{g})  + 
+    R_{\text{g}} P_{\text{p}} T_{\text{g}} - 2 R_\text{n} C \\
+    & = R_\text{n} \left[ (1 + \alpha) P_{\text{p}} (T_{\text{p}} - T_\text{g})  + 
+    (1 + \gamma) P_{\text{p}} T_{\text{g}} - 2 C \right]\\
+    & = R_\text{n} \left[ (1 + \alpha) 2 \eta \, C + 
+    (\gamma - \alpha) P_{\text{p}} T_{\text{g}} - 2 C \right] \\
+    & = R_\text{n} \left[ (1 + \alpha) 2 \eta \, C + 
+    (\gamma - \alpha) (2 \, \eta \, C) \tau_{\text{d}} - 2 C \right]\\
+    & = 2 R_\text{n} \, C \left[ \eta \, (1 + \alpha) +
+    \eta \, \tau_{\text{d}} \, (\gamma - \alpha) -  1 \right]. \label{eq:sv5} 
+\end{align}
+Note that Eq.~\eqref{eq:sv5} reduces to Eq.~\eqref{eq:sv1} when $\tau_{\text{d}} = 0$.
+The payback period is
+\begin{equation}
+    Y_\text{v5} = \frac{K \, C}{S_\text{v5} \, d_\text{y}} 
+    = \frac{K}{2 \, R_\text{n} \, d_\text{y}} \frac{1}{\left[  \eta \, (1 + \alpha) +
+    \eta \, \tau_{\text{d}} \, (\gamma - \alpha) -  1 \right]}. \label{eq:pb5}
+\end{equation}
+Rewriting the above equation for $\tau_{\text{d}}$ in terms of the payback period,
+we get
+\begin{equation}
+    \tau_{\text{d}} = \frac{1}{\eta \, (\gamma - \alpha)} \left[ 
+    \frac{K}{2 \, R_\text{n} \, d_\text{y} \, Y_{\text{v5}}} + 1 
+    - \eta \, (1 + \alpha) \right].
+\end{equation}
+
+\paragraph{Example 5.1} Payback period for a BESS replacing a diesel generator.
+Let $R_{\text{n}} = 7$ Rs./kWh, $\alpha = 0.25$, $\gamma = 3$, $K=30000$ Rs./kWh,
+$\eta = 0.95$, $T_{\text{g}} = 1 $~hr, $T_\text{p}=8$~hr. The payback period is
+\begin{equation}
+    Y_\text{v5} = \frac{30000}{2 \times 7 \times 300} 
+    \frac{1}{[0.95 \times 1.25 + 0.95 \times (1/8) \times (3 - 0.25) - 1]} 
+    \approx 13 \text{ years}.
+\end{equation}
+
+\paragraph{Example 5.2} For how many hours of generator use per day, will the BESS
+payback in a period of 5 years?
+
+The fraction of time the generator is used is
+\begin{equation}
+    \tau_{\text{d}} = \frac{1}{0.95 \times (3 - 0.25)} \left[ 
+    \frac{30000}{2 \times 7 \times 300 \times 5} + 1 
+    - 0.95 \times 1.25 \right] \approx 0.48.
+\end{equation}
+Or BESS can replace cases where the generator is being used for at least 
+$T_\text{g} \approx 4$ hours per day.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paybackPeriod"
+%%% End:
