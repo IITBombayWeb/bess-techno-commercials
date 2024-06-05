@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 
 # sampling time in hours
-Tsamp = 3/12
-Rn = 7 # normal rate of grid cost, Rs/Unit
+Tsamp = 1/12
+Rn = 70 # normal rate of grid cost, Rs/Unit
 
 # Load demand
 Tlavg = 50 # kW average load demand
@@ -19,7 +19,7 @@ Pmax = 100 # Solar capacity in kW
 
 # Simple quad model (trapezium profile) for solar production
 # start time, max start, max end, end 
-Tsquad = (7, 10, 15, 18)
+Tsquad = (7, 10, 15, 18.5)
 
 # Grid slabs
 # List of Normal rate periods
@@ -35,16 +35,16 @@ Ro = Rn*0.75
 
 # BESS parameters
 # Capacity of the battery in kWh
-Cbess = 215
+Cbess = 200
 
 # C-Rating
 Cr = 0.5
 
 # State of Charge (max)
-SoCmax = 80
+SoCmax = 100
 
 # State of Charge (min)
-SoCmin = 20
+SoCmin = 0
 
 
 
@@ -159,10 +159,14 @@ def battery_state(Pload, Psolar, Cr, SoCmax, SoCmin,
     SoC = 0 * ts # initialise all to zero
     Pgrid = 0*ts # initialise all to zero
 
-    SoC[0] = SoCmax
     eps = 1e-3
 
     for i, t in enumerate(ts):
+
+        if (i==0):
+            soc = SoCmax
+        else:
+            soc = SoC[i-1]
 
         # power balance
         Pnet = Psolar[i] - Pload[i]
@@ -170,28 +174,32 @@ def battery_state(Pload, Psolar, Cr, SoCmax, SoCmin,
         if (Pnet > eps):  # Solar charging
             # charge/discharge fully in 1/Cr hours
             print('Solar charging')
-            SoC[i] = np.min([SoC[i-1] + (100*Cr) * tsamp, 100])
+            SoC[i] = np.min([soc + (100*Cr) * tsamp, SoCmax])
 
         else:
             # Off peak rates, grid charging
             for tb,tn in Tgolist:
                 if ((t>= tb) and (t<=tn)):
                     print('Off peak charging')
-                    SoC[i] = np.min([SoC[i-1] + (100*Cr) * tsamp, 100])
+                    SoC[i] = np.min([soc + (100*Cr) * tsamp, SoCmax])
 
             # Normal rates, grid charging
             for tb,tn in Tgnlist:
                 if ((t>= tb) and (t<=tn)):
                     print('Normal charging')
-                    SoC[i] = np.min([SoC[i-1] + (100*Cr) * tsamp, 100])
+                    SoC[i] = np.min([ soc + (100*Cr) * tsamp, SoCmax])
 
             # Peak rates, grid discharging
-            if (SoC[i] >= SoCmin) : # support load during peak time
+            if (soc >= SoCmin) : # support load during peak time
                 for tb,tn in Tgplist:
                     if ((t>= tb) and (t<=tn)):
                         print('Discharging')
-                        #SoC[i] = SoC[i-1] - (100*Cr) * Tsamp * Pnet*Cr/Cbess
-                        SoC[i] = SoC[i-1] - (100*Cr) * tsamp 
+                        SoC[i] = soc + (100*Cr) * Tsamp * Pnet/(Cbess*Cr)
+                        SoC[i] = np.max([SoC[i],SoCmin])
+                        #SoC[i] = SoC[i-1] - (100*Cr) * tsamp 
+            else:
+                print('Battery empty')
+                SoC[i] = SoC[i-1]
 
         print(f"t={t}, Pnet={Pnet}, SoC={SoC[i]}")
 
