@@ -41,10 +41,10 @@ Cbess = 200
 Cr = 0.5
 
 # State of Charge (max)
-SoCmax = 100
+SoCmax = 90
 
 # State of Charge (min)
-SoCmin = 0
+SoCmin = 10
 
 
 
@@ -174,19 +174,20 @@ def battery_state(Pload, Psolar, Cr, SoCmax, SoCmin,
         if (Pnet > eps):  # Solar charging
             # charge/discharge fully in 1/Cr hours
             print('Solar charging')
-            SoC[i] = np.min([soc + (100*Cr) * tsamp, SoCmax])
+            SoC[i] = np.min([soc + (100*Cr) * tsamp * Pnet/(Cbess*Cr), SoCmax])
+            # Pgrid[i] = 0
 
         else:
             # Off peak rates, grid charging
             for tb,tn in Tgolist:
                 if ((t>= tb) and (t<=tn)):
-                    print('Off peak charging')
+                    # print('Off peak charging')
                     SoC[i] = np.min([soc + (100*Cr) * tsamp, SoCmax])
 
             # Normal rates, grid charging
             for tb,tn in Tgnlist:
                 if ((t>= tb) and (t<=tn)):
-                    print('Normal charging')
+                    # print('Normal charging')
                     SoC[i] = np.min([ soc + (100*Cr) * tsamp, SoCmax])
 
             # Peak rates, grid discharging
@@ -194,16 +195,20 @@ def battery_state(Pload, Psolar, Cr, SoCmax, SoCmin,
                 for tb,tn in Tgplist:
                     if ((t>= tb) and (t<=tn)):
                         print('Discharging')
-                        SoC[i] = soc + (100*Cr) * Tsamp * Pnet/(Cbess*Cr)
+                        SoC[i] = soc + (100*Cr) * tsamp * Pnet/(Cbess*Cr)
                         SoC[i] = np.max([SoC[i],SoCmin])
                         #SoC[i] = SoC[i-1] - (100*Cr) * tsamp 
             else:
                 print('Battery empty')
-                SoC[i] = SoC[i-1]
+                SoC[i] = soc
+
+        if (Pnet < 0):
+            Pgrid[i] = np.max([-Pnet + (Cbess*Cr) * (SoC[i] - soc) / tsamp, 0])
+            print(f"Pgrid[i] = {Pgrid[i]}")
 
         print(f"t={t}, Pnet={Pnet}, SoC={SoC[i]}")
 
-    return SoC
+    return SoC,Pgrid
                 
 
 # sampling times including the end points
@@ -214,13 +219,14 @@ Psolar = solar_power(Pmax, Tsquad, ts)
 
 Rgrid = grid_rates(Tgnlist, Tgplist, Tgolist, Rn, Rp, Ro)
 
-SoC = battery_state(Pload, Psolar, Cr, SoCmax, SoCmin, Tgnlist, Tgplist, Tgolist, ts)
+SoC,Pgrid = battery_state(Pload, Psolar, Cr, SoCmax, SoCmin, Tgnlist, Tgplist, Tgolist, ts)
 
 
 plt.plot(ts, Pload, label='Load Power', ls='-', color='b')
 plt.plot(ts, Psolar, label='Solar Power', ls='-', color='r')
 plt.plot(ts, Rgrid, label='Grid Rate', ls='-', color='m')
 plt.plot(ts, SoC, label='SoC', ls='-', marker='o', color='g')
+#plt.plot(ts, Pgrid, label='Grid Power', ls='-', marker='o', color='k')
 
 #plt.plot(ts, Psolar, label='Solar Power', ls='-', marker='o', color='r')
 
