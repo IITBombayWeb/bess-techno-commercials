@@ -3,11 +3,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # sampling time in hours
-Tsamp = 1/60
+Tsamp = 1/12
 
 # BESS parameters
 # Capacity of the battery in kWh
-Cbess = 300
+Cbess = 200
 
 # C-Rating
 Cr = 0.5
@@ -15,24 +15,25 @@ Cr = 0.5
 # State of Charge (max)
 SoCmax = 90
 
-# State of Charge (min)
+# State of Charge (min6
 SoCmin = 10
 
 # Load demand
-Plmax = 90 # kW max contracted load
-Tlavg = 80 # kW average load demand
+Plmax = 75 # k2 ma4 contracted load
+Tlavg = 55 # kW average load demand
 
 # list of periods when there is a load demand at the average value
 Tllist = [(0, 3),
           (6, 16),
           (17,24)]
 
+
 # Solar parameters
 Psmax = 100 # Solar capacity in kW
 
 # Simple quad model (trapezium profile) for solar production
 # start time, max start, max end, end 
-Tsquad = (9, 11, 15, 17)
+Tsquad = (9, 12, 14, 17)
 
 Tsolar = 4.5 # hrs per day
 Rsolar = 2 # Rs./10 kWh
@@ -140,8 +141,8 @@ def grid_rates(Tgnlist, Tgplist, Tgolist, Rn, Rp, Ro):
 
     return Rgrid
 
-def isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin, 
-                  Tgnlist, Tgplist, Tgolist, ts):
+def isem_control(pload, psolar, plmax, cbess, cr, soc0, socmax, socmin, 
+                  tgnlist, tgplist, tgolist, ts):
     """ Returns battery SoC and Grid power used
 
     Args:
@@ -165,27 +166,27 @@ def isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin,
 
     tsamp = ts[1] - ts[0]
 
-    SoC = 0 * ts # initialise all to zero
-    Pgrid = 0*ts # initialise all to zero
+    soct = 0 * ts # initialise all to zero
+    pgrid = 0*ts # initialise all to zero
 
     eps = 1e-3
 
     for i, t in enumerate(ts):
 
         if (i==0):
-            soc = SoC0
+            soc = soc0
             # soc = 25 # 50 kW avg
             # soc = 34 # 50 kW avg
         else:
-            soc = SoC[i-1]
+            soc = soct[i-1]
 
         # power balance
-        Pnet = Psolar[i] - Pload[i]
+        pnet = psolar[i] - pload[i]
 
-        if (Pnet > eps):  # Solar charging
+        if (pnet > eps):  # Solar charging
             # charge/discharge fully in 1/Cr hours
-            print('Solar charging')
-            SoC[i] = np.min([soc + (100*Cr) * tsamp * Pnet/(Cbess*Cr), SoCmax])
+            # print('Solar charging')
+            soct[i] = np.min([soc + (100*cr) * tsamp * pnet/(cbess*cr), socmax])
             # Pgrid[i] = 0
 
         else:
@@ -193,34 +194,42 @@ def isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin,
             for tb,tn in Tgolist:
                 if ((t>= tb) and (t<=tn)):
                     # print('Off peak charging')
-                    SoC[i] = np.min([soc + (100*Cr) * tsamp * (Plmax+Pnet)/(Cbess*Cr), SoCmax])
+                    soct[i] = np.min([soc + 100 * tsamp * (plmax+pnet)/cbess, socmax])
                     # note Pnet is negative
 
             # Normal rates, excess grid charging
-            for tb,tn in Tgnlist:
+            for tb,tn in tgnlist:
                 if ((t>= tb) and (t<=tn)):
                     # print('Normal charging')
-                    SoC[i] = np.min([ soc + (100*Cr) * tsamp * (Plmax+Pnet)/(Cbess*Cr), SoCmax])
+                    soct[i] = np.min([ soc + 100 * tsamp * (plmax+pnet)/cbess, socmax])
 
-            # Peak rates, grid discharging
-            if (soc >= SoCmin) : # support load during peak time
-                for tb,tn in Tgplist:
+            # Peak rates, discharging
+            if (soc >= socmin) : # support load during peak time
+                for tb,tn in tgplist:
                     if ((t>= tb) and (t<=tn)):
-                        print('Discharging')
-                        SoC[i] = soc + (100*Cr) * tsamp * Pnet/(Cbess*Cr)
-                        SoC[i] = np.max([SoC[i],SoCmin])
+                        # print('Discharging (at peak)')
+                        soct[i] = soc + 100 * tsamp * pnet/cbess
+                        soct[i] = np.max([soct[i],socmin])
                         #SoC[i] = SoC[i-1] - (100*Cr) * tsamp 
+
+                # Any time, if the Load requires larger than contracted load, then discharge 
+                if (pnet > plmax):
+                    # print('Discharging (excess load)')
+                    soct[i] = soc + 100 * tsamp * pnet/cbess
+                    soct[i] = np.max([soct[i],socmin])
+
             else:
                 print('Battery empty')
                 SoC[i] = soc
+            
 
-        if (Pnet <= eps):
-            Pgrid[i] = np.max([-Pnet + Cbess * (SoC[i] - soc) / (100 * tsamp), 0])
-            print(f"Pgrid[i] = {Pgrid[i]}")
+        if (pnet <= eps):
+            pgrid[i] = np.max([-pnet + cbess * (soct[i] - soc) / (100 * tsamp), 0])
+            # print(f"pgrid[i] = {pgrid[i]}")
 
-        print(f"t={t}, Pnet={Pnet}, SoC={SoC[i]}")
+        # print(f"t={t}, pnet={pnet}, SoC={soct[i]}")
 
-    return SoC,Pgrid
+    return soct,pgrid
                 
 
 # sampling times including the end points
@@ -236,18 +245,22 @@ SoC,Pgrid = isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin, 
 SoC0 = SoC[-1] # iterate with 24 hr value
 SoC,Pgrid = isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin, Tgnlist, Tgplist, Tgolist, ts)
 
+# Determine rate of charge/discharge
+Crates = np.diff(SoC, append=SoC[0])/Tsamp / 100
+
 ## Cost savings
 
 # Current bill
 pr = Pload * Rgrid/10
-Bnow = Tsamp * (sum(pr) - pr[0] - pr[-1])/2
+Bnow = Tsamp * (2*sum(pr) - pr[0] - pr[-1])/2
+print(f"Bnow = {Bnow}")
 
 # Total solar energy, Area under the curve of Solar power
-Esolar = Tsolar * (sum(Psolar) - Psolar[0] - Psolar[-1])/2
+Esolar = Tsamp * (2*sum(Psolar) - Psolar[0] - Psolar[-1])/2
 print(f"Esolar = {Esolar}")
 
 pr = Pgrid * Rgrid/10
-Bv1 = Rsolar*Esolar +  Tsamp * (sum(pr) - pr[0] - pr[-1])/2
+Bv1 = Rsolar*Esolar +  Tsamp * (2*sum(pr) - pr[0] - pr[-1])/2
 
 dailySavings = Bnow - Bv1
 biMonthlySavings = dailySavings * 26 * 2
@@ -267,7 +280,6 @@ plt.plot(ts, Pgrid, label='Grid Power', ls='-', marker='o', color='k')
 plt.plot(ts, Rgrid, label='Grid Cost [Rs/10 kWh]', ls='-', color='m')
 plt.plot(ts, SoC, label='SoC', ls='-', marker='o', color='g')
 
-#plt.plot(ts, Psolar, label='Solar Power', ls='-', marker='o', color='r')
 
 # Add labels and title
 plt.xlabel("Time")
@@ -276,8 +288,18 @@ plt.title("Demand vs Supply (kW)")
 plt.legend()
 
 # ticks
-ax = plt.gca()
-ax.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(1))
+ax1 = plt.gca()
+ax1.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(1))
+
+ax2 = ax1.twinx()
+ax2.plot(ts, Crates, label='C-Rate', ls='-', color='c')
+ax2.set_ylabel("C-Rate")
+
+# adjust the legend to include both axes
+lines1, labels1 = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines1 + lines2, labels1 + labels2)
+
 
 #plt.figure()
 #plt.plot(yony, yearlySaving, label='Yearly Savings', ls='-', marker='o', color='b')
