@@ -3,7 +3,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # sampling time in hours
-Tsamp = 1/12
+Tsamp = 1/60
 
 # BESS parameters
 # Capacity of the battery in kWh
@@ -19,12 +19,12 @@ SoCmax = 90
 SoCmin = 10
 
 # Load demand
-Plmax = 75 # kW max contracted load
-Tlavg = 60 # kW average load demand
+Plmax = 90 # kW max contracted load
+Tlavg = 80 # kW average load demand
 
 # list of periods when there is a load demand at the average value
 Tllist = [(0, 3),
-          (6.5, 16),
+          (6, 16),
           (17,24)]
 
 # Solar parameters
@@ -32,13 +32,16 @@ Psmax = 100 # Solar capacity in kW
 
 # Simple quad model (trapezium profile) for solar production
 # start time, max start, max end, end 
-Tsquad = (8, 11, 15, 17.5)
+Tsquad = (9, 11, 15, 17)
+
+Tsolar = 4.5 # hrs per day
+Rsolar = 2 # Rs./10 kWh
 
 # Grid slabs
 # List of Normal rate periods
 Tgnlist = [(10,18)]
 
-Rn = 70 # normal rate of grid cost, Rs/Unit
+Rn = 70 # normal rate of grid, Rs/ 10 Unit
 
 
 
@@ -79,7 +82,7 @@ def solar_power(pmax, tsquad, ts):
 
     Args:
         pmax (float): maximum solar power in day
-        tsquad (tuple): (begin, max start, max end, end)
+        tsquad (tuple): (solar begin, max start, max end, solar end)
         ts (numpy array): sampling time instances (hours)
 
     Returns:
@@ -233,8 +236,31 @@ SoC,Pgrid = isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin, 
 SoC0 = SoC[-1] # iterate with 24 hr value
 SoC,Pgrid = isem_control(Pload, Psolar, Plmax, Cbess, Cr, SoC0, SoCmax, SoCmin, Tgnlist, Tgplist, Tgolist, ts)
 
+## Cost savings
+
+# Current bill
+pr = Pload * Rgrid/10
+Bnow = Tsamp * (sum(pr) - pr[0] - pr[-1])/2
+
+# Total solar energy, Area under the curve of Solar power
+Esolar = Tsolar * (sum(Psolar) - Psolar[0] - Psolar[-1])/2
+print(f"Esolar = {Esolar}")
+
+pr = Pgrid * Rgrid/10
+Bv1 = Rsolar*Esolar +  Tsamp * (sum(pr) - pr[0] - pr[-1])/2
+
+dailySavings = Bnow - Bv1
+biMonthlySavings = dailySavings * 26 * 2
+
+print("Bi monthly bill = ", Bnow*2*26)
+print(f"Daily Savings = {dailySavings}")
+print(f"Bi-Monthly Savings = {biMonthlySavings}")
+
+yony = np.arange(0,15)
+yearlySaving = yony * dailySavings * 300
 
 
+plt.figure()
 plt.plot(ts, Pload, label='Load Power', ls='-', color='b')
 plt.plot(ts, Psolar, label='Solar Power', ls='-', color='r')
 plt.plot(ts, Pgrid, label='Grid Power', ls='-', marker='o', color='k')
@@ -243,17 +269,19 @@ plt.plot(ts, SoC, label='SoC', ls='-', marker='o', color='g')
 
 #plt.plot(ts, Psolar, label='Solar Power', ls='-', marker='o', color='r')
 
-
 # Add labels and title
 plt.xlabel("Time")
 plt.ylabel("Power")
 plt.title("Demand vs Supply (kW)")
+plt.legend()
 
 # ticks
 ax = plt.gca()
 ax.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(1))
 
+#plt.figure()
+#plt.plot(yony, yearlySaving, label='Yearly Savings', ls='-', marker='o', color='b')
 
 # Display the plot
-plt.legend()
 plt.show()
+
