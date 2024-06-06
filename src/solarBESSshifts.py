@@ -3,11 +3,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # sampling time in hours
-Tsamp = 1/12
+Tsamp = 1/60
 
 # BESS parameters
 # Capacity of the battery in kWh
-Cbess = 200
+Cbess = 215
 Rbess = 30000 # Rs./kWh
 
 # C-Rating
@@ -34,10 +34,10 @@ Psmax = 100 # Solar capacity in kW
 
 # Simple quad model (trapezium profile) for solar production
 # start time, max start, max end, end 
-Tsquad = (9, 12, 14, 17)
+Tsquad = (9.5, 12, 14, 16.5)
 
 Tsolar = 4.5 # hrs per day
-Rsolar = 2 # Rs./10 kWh
+Rsolar = 2 # Rs./ kWh
 
 # Grid slabs
 # List of Normal rate periods
