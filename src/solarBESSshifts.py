@@ -8,6 +8,7 @@ Tsamp = 1/12
 # BESS parameters
 # Capacity of the battery in kWh
 Cbess = 200
+Rbess = 30000 # Rs./kWh
 
 # C-Rating
 Cr = 0.5
@@ -301,9 +302,12 @@ lines2, labels2 = ax2.get_legend_handles_labels()
 ax1.legend(lines1 + lines2, labels1 + labels2)
 
 
-#plt.figure()
-#plt.plot(yony, yearlySaving, label='Yearly Savings', ls='-', marker='o', color='b')
+plt.figure()
+plt.plot(yony, yearlySaving, label='Yearly Savings', ls='-', marker='o', color='b')
 
 # Display the plot
+besscost = np.ones(len(yony))*Cbess*Rbess
+plt.plot(yony, besscost, label='BESS Cost', ls='-', color='r')
+
 plt.show()
 
