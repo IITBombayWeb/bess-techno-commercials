@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Savings Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Battery Savings Calculator</h1>
+        <form id="inputForm">
+            <label for="eta">Round Trip Efficiency (η):</label>
+            <input type="number" id="eta" step="0.01" required placeholder="e.g., 0.9">
+
+            <label for="F">1/C-rate (= F):</label>
+            <input type="number" id="F" step="0.01" required placeholder="e.g., 0.1">
+
+            <label for="alpha">Minimum State of Charge (= 1 - α):</label>
+            <input type="number" id="alpha" step="0.01" required placeholder="e.g., 0.2">
+
+            <label for="dy">No. of Active Power Consumption Days (dy):</label>
+            <input type="number" id="dy" required placeholder="e.g., 365">
+
+            <label for="K">Initial Rate of the Battery in Rs per kWh (K):</label>
+            <input type="number" id="K" step="0.01" required placeholder="e.g., 300">
+
+            <label for="Rg">Grid Electricity Rate in Rs per kWh (Rg):</label>
+            <input type="number" id="Rg" step="0.01" required placeholder="e.g., 0.1">
+
+            <label for="Rd">Rate of Diesel in Rs per kWh (Rd):</label>
+            <input type="number" id="Rd" step="0.01" required placeholder="e.g., 0.15">
+
+            <label for="Tauo">Average Power Outage Duration (Tauo) in hours:</label>
+            <input type="number" id="Tauo" step="0.01" required placeholder="e.g., 1">
+
+            <label for="No">Average No of Outages per Day (No):</label>
+            <input type="number" id="No" step="0.01" required placeholder="e.g., 2">
+
+            <label for="P_L">Constant Load (P_L) in kW:</label>
+            <input type="number" id="P_L" step="0.01" required placeholder="e.g., 5">
+
+            <label for="d">Discount Rate:</label>
+            <input type="number" id="d" step="0.01" required placeholder="e.g., 0.5">
+
+            <label for="lt">Lifetime (in yrs):</label>
+            <input type="number" id="lt" step="0.1" required placeholder="e.g., 5">
+
+            <label for="OM">Annualised O&M in Rs per kWh:</label>
+            <input type="number" id="OM" step="0.1" required placeholder="e.g., 5">
+
+            <label for="i">Inflation Rate:</label>
+            <input type="number" id="i" step="0.01" required placeholder="e.g., 0.5">
+
+
+
+
+            <button type="submit">Calculate and Plot</button>
+        </form>
+        <div id="plot"></div>
+    </div>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
