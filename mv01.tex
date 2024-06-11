@@ -1,0 +1,105 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section{PV + Grid Model v1}
+
+In this model, total solar capacity installed is some fraction of the total daily load. This means, that some amount of total peak and normal load is shared by solar PV installed.
+
+\subsection{Assumptions}
+\begin{enumerate}
+    \item Grid power is available at three prices: \( R_p \) for peak rate (Rs./kWh), \( R_N \) (Rs./kWh) for normal or base rate and \( R_{op} \) is the off-peak rate. The relationship is defined as
+    \[
+    R_p = (1 + \alpha) R_N,
+    \]
+    where \( \alpha \) is the premium factor for peak rate power.
+    \[
+    R_{op} = (1 - \beta) R_N,    
+    \]
+    where \( \beta \) is the discount factor for off-peak rate.
+
+    \item The peak rate period during daytime hours per day is \( T_{pd} \) hours, peak rate period during night hours per day is \( T_{pn} \) hours, normal-rate duration
+    is \( T_N \) hours per day and off-peak rate period is  \( T_{op} \) per day, solar time for which PV operates is given by \( T_s \).
+
+    \item During peak rate hours, the power demand is \( P_p \)  during normal-rate hours, the power demand is \( P_N \) kW and during the off-peak rate period, the power demand is \( P_{op} = 0\) kW. Power demand during peak day hours and peak night hours are assumed to be the same.
+
+\end{enumerate}
+
+\subsection{Model}
+Without the BESS, the daily electricity bill (in Rs.) is
+\[
+B_{\text{now}} = R_N P_N T_N + R_p P_{p} T_{pd} + R_p P_{p} T_{pn}
+\]
+
+When solar panel is installed, solar panel is used to meet the load during day hous for some fraction of the total daily load.
+The total daily load is given by,
+\[
+E_{\text{load}} = P_N T_N + P_{p} T_{pd} + P_{p} T_{pn} \tag{1}   
+\]
+The capacity of solar PV, \( C_{\text{solar}} \) that needs to be installed is,
+\[
+C_{\text{solar}} = \epsilon E_{\text{load}} \tag{2}
+\]
+where, \( \epsilon \) is the fraction of the time, solar energy is used to meet the load. Here \( \epsilon < 1 \).
+The required solar wattage is,
+\[
+P_{\text{solar}} = \frac{C_{\text{solar}}}{T_s} \tag{3}
+\]
+Now, daily electricity bill comes out to be,
+\[
+B_{v1} = R_p P_p T_{pd} - R_p C_{\text{solar}} \frac{T_{pd}}{T_s}
+       + R_N P_N T_N - R_N C_{\text{solar}} \frac{T_{N}}{T_s}
+       + R_p P_p T_{pn}
+\]
+Daily savings in this case will be,
+\[
+S_{v1} = B_{\text{now}} - B_{v1}
+\]
+\[
+S_{v1} = R_N P_N T_N + R_p P_{p} T_{pd} + R_p P_{p} T_{pn} - R_p P_p T_{pd} + R_p C_{\text{solar}} \frac{T_{pd}}{T_s}
+       - R_N P_N T_N + R_N C_{\text{solar}} \frac{T_{N}}{T_s}
+       - R_p P_p T_{pn} 
+\]
+\[
+S_{v1} = R_p C_{\text{solar}} \frac{T_{pd}}{T_s} + R_N C_{\text{solar}} \frac{T_{N}}{T_s}
+\]
+\[
+       = (R_p T_{pd} + R_N T_N) P_{\text{solar}} \tag{4}
+\]
+
+\subsection{Payback period}
+The installation cost of solar PV is \( K \) Rs./kW. The simple payback period is the time taken for the savings to equal the capital cost. The simple payback period (in years) is
+\[
+Y_{v1} = \frac{K P_{\text{solar}}}{S_{v1} d_y} 
+       = \frac{K P_{\text{solar}}}{((R_p T_{pd} + R_N T_N) P_{\text{solar}}) d_y} \tag{5}
+\]
+where \( d_y \) is the number of active power consumption days in a year. Note that
+the expression for the simple payback period only depends on the installation cost and time for which solar power is used. 
+
+\subsection{Example 1.1}
+Payback period for a BESS. Let \( R_N = 4 \) Rs./kWh, \( R_p = 5.5 \) Rs./kWh,
+\( d_y = 365 \) days, \( K = 54000 \) Rs./kW. Let \( T_N = 9 \) hours, \( T_{pd} = 3 \) hours, \( T_{pn} = 4 \) hours, \( T_s = 5 \) hours. 
+Let \( P_N = 3 \) kW, \( P_p = 5 \) kW, \( P_{op} = 0 \) kW, and let \( \epsilon = 0.25\).
+First, we calculate total daily load using equation (1),
+\[
+E_{\text{load}} = 3 \times 9 + 5 \times 3 + 5 \times 4  
+                = 62 kWh 
+\]
+Then, we calculate solar energy required using equation (2),
+\[
+C_{\text{solar}} =  0.25 \times 62 
+                 =  15.5 kWh 
+\]
+Using equation (3), we find out solar power required to install,
+\[
+P_{\text{solar}} = \frac{15.5}{5}
+                 = 3.1 kW
+\]
+Now, we can calculate simple payback period using equation (4) and (5), 
+\[
+Y_{v1} = \frac{54000 \times 3.1}{(5.5 \times 3 + 4 \times 9) \times 3.1 \times 365}
+       = 2.81 years
+\]
+
+\end{document}
