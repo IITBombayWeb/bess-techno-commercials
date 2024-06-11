@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section{PV + Grid Model v2}
+
+In this model, installed solar capacity is higher than required total daily load. So, in this case \( \epsilon > 1\). The excess solar energy generated is sold back to the grid at buyback rate \( R_b \). 
+Daily electricity bill in this case will be,
+\[
+B_{v2} = R_p T_{pn} P_p - (\epsilon - 1) E_{\text{load}} R_b 
+\]
+Here, electricity demand during day is compensated by solar power. Daily savings due to excess solar energy is
+\[
+S_{v2} = R_p P_p T_{pd} + R_N P_N T_N + (\epsilon - 1) E_{\text{load}} R_b \tag{6}
+\]
+
+The simple payback period is
+\[
+Y_{v2} = \frac{K P_{\text{solar}}}{S_{v2} d_y}
+       = \frac{K P_{\text{solar}}}{R_p P_p T_{pd} + R_N P_N T_N + (\epsilon - 1) E_{\text{load}} R_b} \tag{7}
+\]
+The expression for SPP depends on installation cost, excess solar energy generated and load that was compensated during daytime by solar.
+
+\subsection{Example 2.1}
+Payback period for a excess solar installed. Let \( R_b = 2 \) Rs./kWh and \( \epsilon = 1.25 \), and the rest is same as Example 1.1.
+First, we calculate total daily load using equation (1),
+\[
+E_{\text{load}} = 3 \times 9 + 5 \times 3 + 5 \times 4  
+                = 62 kWh 
+\]
+Then, we calculate solar energy required using equation (2),
+\[
+C_{\text{solar}} =  1.25 \times 62 
+                 =  77.5 kWh 
+\]
+Using equation (3), we find out solar power required to install,
+\[
+P_{\text{solar}} = \frac{15.5}{5}
+                 = 15.5 kW
+\]
+Now, we can calculate simple payback period using equation (6) and (7), 
+\[
+Y_{v2} = \frac{54000 \times 15.5}{(5.5 \times 5 \times 3 + 4 \times 3 \times 9 + (1.25 - 1) \times 2 \times 62) \times 365}
+       = 10.35 years
+\]
+
+\end{document}

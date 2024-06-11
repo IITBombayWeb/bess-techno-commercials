@@ -1,0 +1,49 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section{PV + BESS Model v3}
+
+In this model, the solar energy generated is used to compensate the electricity demand during day and the excess solar energy is used to charge the battery during daytime.
+The battery is discharged during peak night hours. Thus, the capacity of the battery is defined as,
+\[
+C_{\text{batt}} = ( \epsilon - 1 ) E_{\text{load}}       \tag{8}
+\] 
+Daily electricity bill in this case will be,
+\[
+B_{v3} = R_p P_p T_{pn} - (C_{\text{batt}}) R_p
+\]
+
+Savings in this case will be,
+\[
+S_{v3} =  P_p R_p T_{pd} + R_N P_N T_N + ( \epsilon - 1 ) E_{\text{load}} R_p   \tag{9}  
+\]
+
+For installation cost in this case, we will have to account for solar PV as well as battery. Let installation cost for battery be \( J \) Rs./kWh.
+SPP in this case can be calcuated as,
+\[
+Y_{v3} = \frac{(K \times P_{\text{solar}}) + (J \times C_{\text{batt}})}{(P_p R_p T_{pd} + R_N P_N T_N + ( \epsilon - 1 ) E_{\text{load}} R_p) \times d_y}    \tag{10}   
+\]
+
+\subsection{Example 3.1}
+Let \( J = 29000\) Rs./kWh. Let everything else be the same as Example 2.1 and Example 1.1
+\[
+E_{\text{load}} = 62 kWh       
+\] 
+\[
+C_{\text{solar}} = 1.25 \times 62 = 77.5 kWh
+\]
+\[
+P_{\text{solar}} = \frac{77.5}{5} = 15.5 kW       
+\]
+\[
+C_{\text{batt}} = 0.25 \times 62 = 15.5 kWh       
+\]
+Now, using equation (9) and (10), we can find SPP,
+\[
+Y_{v3} = \frac{(54000 \times 15.5) + (29000 \times 15.5)}{(5 \times 5.5 \times 3 + 4 \times 3 \times 9 + 0.25 \times 62) \times 365} 
+       = 17.1 years      
+\]
+
+\end{document}
